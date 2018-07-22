@@ -95,7 +95,7 @@ The model used an adam optimizer, so the learning rate was not tuned manually (m
 
 #### 4. Appropriate training data
 
-Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road ... 
+Training data was chosen to keep the vehicle driving on the road. I used a combination of center lane driving, recovering from the left and right sides of the road.
 
 For details about how I created the training data, see the next section. 
 
@@ -142,6 +142,7 @@ To capture good driving behavior, I used the data provided by Udacity as the bas
 ![alt text](./example_images/center_2016_12_01_13_39_19_022.jpg "Baseline Image")
 
 I then recorded the vehicle driving in the reverse direction for two laps. An example of an image captured in the reverse direction is:
+
 ![alt text](./example_images/center_2018_07_22_09_09_06_259.jpg "Reverse direction")
 
 
