@@ -123,7 +123,7 @@ The model first normalizes the input (cloning_models.py line 10) using a Keras l
 
 Here is a visualization of the architecture
 
-![Nvidia architecture][nvidia_model_architecture.png]
+![alt text](nvidia_model_architecture.png "Nvidia Model Architecture")
 
 #### 3. Creation of the Training Set & Training Process
 
