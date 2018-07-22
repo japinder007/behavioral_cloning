@@ -103,27 +103,27 @@ For details about how I created the training data, see the next section.
 
 #### 1. Solution Design Approach
 
-The overall strategy for deriving a model architecture was to ...
+The overall strategy for deriving a model architecture was to start exploring simple models and progressively iterate to try out more complex ones. I setup the training pipeline setup to make it easier to experiment with different model types. The candidate models I had in mind were MLP, Lenet and the Nvidia model. I tried the simpler models (single layer NN and Lenet) first to get more familiar with the overall training and testing flow. For Lenet, I tried additional variants of the standard architecture by adding more layers, trying out wider networks etc to understand how the model did as I changed these parameters. With these simple models, I was about to make some headway but could not get the car to drive around the track for a complete lap.
 
-My first step was to use a convolution neural network model similar to the ... I thought this model might be appropriate because ...
+I then decided to implement the Nvidia architecture recommended by the instructor and see if that would help. Initially I trained on just the data provided by Udacity and see how far I could go with that. I first trained using only the center image, then enhanced the training pipeline to also train on the left and right images. That helped slightly but still I could not get the car to drive across the full lap. The car would veer off the road during turns and also in areas which were different - bridge, area where the lane was not marked (there was a muddy patch on the right) and areas where the curve was too sharp. 
 
-In order to gauge how well the model was working, I split my image and steering angle data into a training and validation set. I found that my first model had a low mean squared error on the training set but a high mean squared error on the validation set. This implied that the model was overfitting. 
+I struggled a lot to make progress at that time and then I started to collect more data. I collected data for two additional laps. Having not played video games at all in my life, I struggled quite a bit during the data collection phase. The model did not improve much and I was thinking that my lack of skil in capturing data (I was using the keys to get the car to turn) could be a factor. 
 
-To combat the overfitting, I modified the model so that ...
+At that point I thought of analyzing my data and the errors which my best model till that point was making. I realized that the errors were much more prominent for cases where the expected steering values were large. Then I though of digging into it further and thought of looking at the distribution of steering values in the training set. I broke up the steering range of [-1, 1] into 25 buckets and looked at the distribution of the examples in those buckets. To my surprise, this was a distribution with three major peaks. Please look at distribution: 
+![alt text](train_steering.png "Distribution of training examples by steering values"). Based on the distribution, I conjectured that the dominant distributions might be causing the model to overfit to the three modes and might be hard for the model to effectively learn from the other examples. Based on this, I wrote a Sampler class (sampler.py) which downsamples the buckets which occur more frequently than the average s.t. all classes have about the average number of examples. It does not sample classes which have fewer than the average number of examples. In addition, I also collected additional examples where I trained the model to recover when it is about to veer off the track. In the simulator I drove towards the edge of the lane and then corrected (both sides). I also collected data for the track in the opposite direction so that the model generalizes better.
 
-Then I ... 
-
-The final step was to run the simulator to see how well the car was driving around track one. There were a few spots where the vehicle fell off the track... to improve the driving behavior in these cases, I ....
 
 At the end of the process, the vehicle is able to drive autonomously around the track without leaving the road.
 
 #### 2. Final Model Architecture
 
-The final model architecture (model.py lines 18-24) consisted of a convolution neural network with the following layers and layer sizes ...
+My model is based on the model proposed by Nvidia (cloning_models.py lines 57-72). The model is described in detail [here](https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). 
 
-Here is a visualization of the architecture (note: visualizing the architecture is optional according to the project rubric)
+The model first normalizes the input (cloning_models.py line 10) using a Keras lambda layer. It also crops a part of the top of the image (cloning_models.py line 11). This is followed by five convolutional layers (cloning_models.py line 60-64) and a flatten layer. Lastly, there are four dense layers (cloning_models.py lines 67-70). All the convolutional layers include the RELU activation.
 
-![alt text][image1]
+Here is a visualization of the architecture
+
+![Nvidia architecture][nvidia_model_architecture.png]
 
 #### 3. Creation of the Training Set & Training Process
 
