@@ -98,10 +98,24 @@ def main():
 	sampled_augmentations = list(filter(lambda a: should_sample(sampler.sampling_probability(a.steering_value())), augmentations))
 	print('After sampling training data has {n} images '.format(n=len(sampled_augmentations)))
 	
+	# Pick the model the user wants to run.
+	# Choices are
+	# 1) basic (Single layer NN).
+	# 2) lenet (Lenet architecture)
+	# 3) nvidia (Nvidia's architecture described in the assignment)
+	# 4) ELU - An architecture based on recommendations for behavioral
+	#    cloning models.
+	# Of these, I spent most of the time optimizing the NVidia network and
+	# the final model is generated from that.
 	model = name_to_model_function_map[args.model](sampled_augmentations)
 	model.compile(loss='mse', optimizer='adam')
 	training_augmentations, validation_augmentations = split_train_test(sampled_augmentations)
 	
+	# Break up the steering range into 25 buckets and see the
+	# distribution of the steering values in these. Most examples
+	# are zero (straight driving) or clustered around two other values.
+	# We need to down sample some of these very frequent values so that
+	# the model generalizes better.
 	print('Plotting histogram of training steering values ...')
 	plot_distribution(training_augmentations, args.file_histogram)
 	print('Done plotting histogram')
@@ -116,7 +130,8 @@ def main():
 	print('Model written file {m}'.format(m=output_file))
 	print(history_object.history)
 	
-	# Print generating predictions over the training set.
+	# Visualize the error vs. expected steering values to get a
+	# sense of where the model is performing well/badly.
 	print('Plotting MSE vs steering values')
 	X_sample, y_sample = generate_XY_samples(augmentations, 0.1)
 	plot_mse_sample(
