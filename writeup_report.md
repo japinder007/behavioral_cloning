@@ -119,7 +119,17 @@ At the end of the process, the vehicle is able to drive autonomously around the 
 
 My model is based on the model proposed by Nvidia (cloning_models.py lines 57-72). The model is described in detail [here](https://images.nvidia.com/content/tegra/automotive/images/2016/solutions/pdf/end-to-end-dl-using-px.pdf). 
 
-The model first normalizes the input (cloning_models.py line 10) using a Keras lambda layer. It also crops a part of the top of the image (cloning_models.py line 11). This is followed by five convolutional layers (cloning_models.py line 60-64) and a flatten layer. Lastly, there are four dense layers (cloning_models.py lines 67-70). All the convolutional layers include the RELU activation.
+The input is trained using the image pixel values as features and the expected steering values as the output. It is a regression model, which learns a continuous output (steering values). The metric to optimize is the MSE (mean square error) between the expected steering output and the prediction of the model.
+
+The model is implemented in cloning_models.py (lines 56-70). It does the following
+* Normalizes the input (cloning_models.py line 10) using a Keras lambda layer.
+* Crops a part of the top of the image (cloning_models.py line 11).
+* Has five convolution layers (cloning_models.py line 60-64). Each convolutional layers include the RELU activation which is the key non-linear operation.
+* A flatten layer (cloning_models.py line 65).
+* Four dense layers (cloning_models.py lines 67-70)
+* The optimization metric is 'mse' and I use the 'adam' optimizer which automatically tunes the learning rate (model.py line 111).
+* The training and validation is done in batches and I use a generator to generate the training and validation batches. This enables the model to handle large training examples as only a portion of the images need to be in memory at a given time. The generator logic is implemented in generator.py and is invoked in model.py (line 128).
+* The training and validation sets are shuffled before generation of each batch (generator.py line 29) to avoid dependencies between examples in a batch.
 
 Here is a visualization of the architecture
 
@@ -127,28 +137,25 @@ Here is a visualization of the architecture
 
 #### 3. Creation of the Training Set & Training Process
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+To capture good driving behavior, I used the data provided by Udacity as the base line. Here is an example of an image provided in the dataset:
 
-![alt text][image2]
+![alt text][example_images/center_2016_12_01_13_39_19_022.jpg]
 
-I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to .... These images show what a recovery looks like starting from ... :
-
-![alt text][image3]
-![alt text][image4]
-![alt text][image5]
-
-Then I repeated this process on track two in order to get more data points.
-
-To augment the data sat, I also flipped images and angles thinking that this would ... For example, here is an image that has then been flipped:
-
-![alt text][image6]
-![alt text][image7]
-
-Etc ....
-
-After the collection process, I had X number of data points. I then preprocessed this data by ...
+I then recorded the vehicle driving in the reverse direction for two laps. An example of an image captured in the reverse direction is:
+![alt text][example_images/center_2018_07_22_09_09_06_259.jpg]
 
 
-I finally randomly shuffled the data set and put Y% of the data into a validation set. 
+I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to recover if it is trying to veer off the road. These images show what a recovery looks like starting from the vehicle about to veer off the left side of the road:
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was Z as evidenced by ... I used an adam optimizer so that manually training the learning rate wasn't necessary.
+![alt text][example_images/center_2018_07_22_09_04_06_157.jpg]
+
+To augment the data sat, I also flipped images and angles thinking that this would help the model generalize better. For example, here is an image that has then been flipped:
+
+![alt text][example_images/center_2018_07_22_09_04_06_157_flipped.jpg]
+
+After the collection process, I had 29214 number of training data points. I then preprocessed this data by normalization and cropping the images (cloning_models.py lines 9-12).
+
+
+I finally randomly shuffled the data set and put 20% of the data into a validation set. My validation set had a size of 7304. 
+
+I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was 3 as evidenced by the validation loss start to increase back again after 3 epochs. I used an adam optimizer so that manually training the learning rate wasn't necessary.
