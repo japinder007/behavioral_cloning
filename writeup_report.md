@@ -139,19 +139,19 @@ Here is a visualization of the architecture
 
 To capture good driving behavior, I used the data provided by Udacity as the base line. Here is an example of an image provided in the dataset:
 
-![alt text][example_images/center_2016_12_01_13_39_19_022.jpg]
+![alt text](./example_images/center_2016_12_01_13_39_19_022.jpg "Baseline Image")
 
 I then recorded the vehicle driving in the reverse direction for two laps. An example of an image captured in the reverse direction is:
-![alt text][example_images/center_2018_07_22_09_09_06_259.jpg]
+![alt text](./example_images/center_2018_07_22_09_09_06_259.jpg "Reverse direction")
 
 
 I then recorded the vehicle recovering from the left side and right sides of the road back to center so that the vehicle would learn to recover if it is trying to veer off the road. These images show what a recovery looks like starting from the vehicle about to veer off the left side of the road:
 
-![alt text][example_images/center_2018_07_22_09_04_06_157.jpg]
+![alt text](./example_images/center_2018_07_22_09_04_06_157.jpg "Recovery image")
 
 To augment the data sat, I also flipped images and angles thinking that this would help the model generalize better. For example, here is an image that has then been flipped:
 
-![alt text][example_images/center_2018_07_22_09_04_06_157_flipped.jpg]
+![alt text](./example_images/center_2018_07_22_09_04_06_157_flipped.jpg "Flipped image")
 
 After the collection process, I had 29214 number of training data points. I then preprocessed this data by normalization and cropping the images (cloning_models.py lines 9-12).
 
